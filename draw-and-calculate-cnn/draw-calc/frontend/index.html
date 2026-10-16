@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draw &amp; Calculate</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Manrope:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <nav><a href="#calc">Calculator</a><a href="#inside">Inside the CNN</a><a href="#train">Training results</a><a href="#mine">My handwriting</a></nav>
+</header>
+
+<main>
+<section id="calc" class="card hero">
+  <h1>Draw &amp; Calculate</h1>
+  <p class="lead">Write a sum with your mouse or finger, for example <b>23 + 45 × 2</b>. A convolutional neural network reads every character, then the app solves it.</p>
+  <div class="padwrap"><canvas id="pad" width="900" height="260"></canvas><span class="padhint" id="padhint">Draw here. Leave a small gap between characters.</span></div>
+  <div class="row">
+    <button id="btnCalc" class="primary">Calculate</button>
+    <button id="btnUndo">Undo stroke</button>
+    <button id="btnClear">Clear</button>
+    <label class="auto"><input type="checkbox" id="auto" checked> Auto-calculate when I stop drawing</label>
+  </div>
+
+  <div id="out" hidden>
+    <div class="lcd" id="lcd"></div>
+    <p class="msg" id="msg"></p>
+    <h3>What the CNN read <small>Fix any wrong character with its menu, the answer updates.</small></h3>
+    <div class="chars" id="chars"></div>
+    <div id="stepsBox" hidden><h3>Steps</h3><ol class="steps" id="steps"></ol></div>
+  </div>
+</section>
+
+<section id="inside" class="card">
+  <h2>Inside the CNN</h2>
+  <p class="lead">Click a character card above to see how the network looks at it. The first convolution layer finds simple strokes, the second combines them into shapes.</p>
+  <div class="arch" id="arch"></div>
+  <div id="inspect" class="inspect" hidden>
+    <div><h3>Input (28x28)</h3><canvas id="inImg" width="28" height="28" class="px big"></canvas>
+      <h3>Probabilities</h3><div id="probs"></div></div>
+    <div><h3>Conv layer 1 <small>8 filters</small></h3><div class="maps" id="m1"></div>
+      <h3>Conv layer 2 <small>16 filters</small></h3><div class="maps" id="m2"></div></div>
+  </div>
+  <p class="empty" id="inspectEmpty">Draw something first, then pick a character.</p>
+</section>
+
+<section id="train" class="card">
+  <h2>Training results</h2>
+  <div class="stats" id="stats"></div>
+  <p class="note" id="honest"></p>
+  <div class="charts">
+    <figure><figcaption>Loss (lower is better)</figcaption><div class="cw"><canvas id="cLoss"></canvas></div></figure>
+    <figure><figcaption>Accuracy</figcaption><div class="cw"><canvas id="cAcc"></canvas></div></figure>
+  </div>
+  <h3>Confusion matrix <small>rows = true character, columns = what the CNN said</small></h3>
+  <div class="scroll"><table id="cm"></table></div>
+  <div class="two">
+    <div><h3>Accuracy per character</h3><div id="perclass"></div></div>
+    <div><h3>Most confused pairs</h3><ul id="pairs"></ul>
+      <h3>How the training data is varied</h3>
+      <ul class="plain"><li>Each character has 1 to 3 ways of being written</li><li>Random tilt, slant, size and shape</li><li>Shaky hand wobble and random pen thickness</li><li>Blur and noise on some images</li><li>Random shifts of up to 2 pixels at every epoch</li><li>Real handwritten digits from 43 people mixed in</li></ul></div>
+  </div>
+  <h3>Training images <small>8 examples per character</small></h3>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<section id="mine" class="card">
+  <h2>Test my own handwriting</h2>
+  <p class="lead">The CNN asks you to draw one character. It checks itself, and every answer is saved so you can measure the accuracy on your own handwriting.</p>
+  <div class="mine">
+    <div>
+      <div class="target">Draw: <b id="target">?</b></div>
+      <canvas id="pad2" width="280" height="280"></canvas>
+      <div class="row"><button id="btnCheck" class="primary">Check</button><button id="btnClear2">Clear</button><button id="btnNew">New character</button></div>
+      <p class="verdict" id="verdict"></p>
+    </div>
+    <div>
+      <div class="stats small" id="tally"></div>
+      <h3>Per character</h3><div id="tallyChars" class="tchars"></div>
+      <h3>Last answers</h3><ul id="recent" class="plain"></ul>
+      <p class="note">To teach the CNN your handwriting, run <code>python backend/train.py --with-mine</code> and restart the app.</p>
+    </div>
+  </div>
+</section>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
